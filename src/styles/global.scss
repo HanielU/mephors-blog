@@ -1,0 +1,41 @@
+@mixin flex($align: center, $justify: center) {
+	display: flex;
+	justify-content: $justify;
+	align-items: $align;
+}
+
+@mixin border($color: black, $size: 2px) {
+	border: $size solid $color;
+}
+
+%form-reset {
+	display: block;
+	margin: auto;
+}
+
+$border: 2px solid black;
+
+/* Colors */
+$blue: #0956ea;
+$light-gray: #7a7a7a;
+
+/* Fonts */
+$main-font: "Nunito", sans-serif;
+
+/* Font sizes */
+$smallest: 14px;
+$smaller: 16px;
+$small: 18px;
+$mid: 20px;
+$big: 25px;
+
+/* Font weights */
+$regular: 400;
+$medium: 500;
+$semibold: 600;
+$bold: 700;
+$extrabold: 800;
+
+/* Border radius */
+$little-radius: 8px;
+$basic-radius: 16px;
