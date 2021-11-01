@@ -1,40 +1,70 @@
 <script>
-	import { createEventDispatcher } from "svelte";
+	import { createEventDispatcher, setContext } from "svelte";
+	import { showPost } from "../../utils/store";
+	import Post from "../Post.svelte";
 
 	export let searchedPost, postRead;
 	const dispatch = createEventDispatcher();
+	const openPost = (bool) => ($showPost = bool);
 
-	$: if (postRead) {
+	setContext("openPost", openPost);
+
+	/* $: if (postRead) {
 		dispatch("read", postRead);
-	}
+	} */
 </script>
 
-{#if searchedPost}
+{#if searchedPost && !$showPost}
 	<article>
-		<h1>{searchedPost.data().title}</h1>
-		<p>
-			{searchedPost.data().content}
-		</p>
-		<div class="err">
-			{searchedPost.id}
+		<div class="main">
+			<h1>{searchedPost.data().title}</h1>
 		</div>
 
-		{#if !postRead}
-			<label for="checkIfPostRead">
-				<input type="checkbox" bind:checked={postRead} name="checkIfPostRead" />
-				I have read this post
-			</label>
-		{:else}
-			<h4>You have read this post</h4>
-		{/if}
+		<div class="supplementary">
+			<span class:postRead>
+				{!postRead ? "Not read" : "Read"}
+			</span>
+
+			<span class="view-post" on:click={() => openPost(true)}> View </span>
+		</div>
 	</article>
+{:else}
+	<Post {searchedPost} {postRead} />
 {/if}
 
 <style lang="scss">
+	$light: #f5f5f5;
+	$dark: #121212;
+
 	article {
-		width: 400px;
-		height: 300px;
-		@include border;
+		max-width: 400px;
+		background: white;
+		@include border($color: $blue);
+		border-radius: $basic-radius;
 		margin: auto;
+
+		.main {
+			width: 100%;
+			padding: 20px;
+			border-bottom: 1px solid $light-gray;
+
+			h1 {
+				font-weight: $semibold;
+				color: $dark;
+			}
+		}
+
+		.supplementary {
+			padding: 20px;
+			@include flex($justify: space-between);
+		}
+	}
+
+	span.postRead {
+		color: $light-gray;
+	}
+
+	.view-post {
+		cursor: pointer;
 	}
 </style>

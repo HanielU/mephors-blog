@@ -11,6 +11,7 @@
 		arrayUnion,
 	} from "firebase/firestore";
 	import PostPreview from "./PostPreview.svelte";
+	import { onMount } from "svelte";
 
 	let postID = "";
 
@@ -26,6 +27,8 @@
 		addUserReadToDB();
 	}
 
+	// onMount(searchPosts);
+
 	async function searchPosts() {
 		if (!postID) return;
 		searchedPost = null; // resets searched Posts
@@ -36,7 +39,11 @@
 		); // queries db for post with postID
 		searchStarted = true; // for loading animation?
 		let querySnapShot = await getDocs(postQuery);
-		if (querySnapShot.empty) queryNotFound = true;
+		searchStarted = false;
+		if (querySnapShot.empty) {
+			queryNotFound = true;
+			return;
+		}
 		querySnapShot.forEach((doc) => (searchedPost = doc));
 
 		searchedPost.data().postReadBy.forEach((userID) => {
@@ -44,7 +51,6 @@
 				postRead = true;
 			}
 		});
-		searchStarted = false;
 
 		console.log(searchedPost.data());
 	}
@@ -75,11 +81,17 @@
 {/if}
 
 <style lang="scss">
+	p {
+		width: 100%;
+		max-width: 400px;
+		margin: 0 auto;
+	}
+
 	form {
 		width: 100%;
 		max-width: 400px;
 		padding: 20px;
-		margin: auto;
+		margin: 0 auto 30px;
 		@include border;
 
 		input {
