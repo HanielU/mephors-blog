@@ -1,71 +1,110 @@
 <script>
 	import { db } from "../../firebase.js";
-	import { collection, addDoc } from "firebase/firestore";
-	import { v4 as uuidv4 } from "uuid";
+	import { collection, onSnapshot } from "firebase/firestore";
+	import { fly } from "svelte/transition";
+	import CreatePost from "./CreatePost.svelte";
+	import PlusIcon from "../svgs/PlusIcon.svelte";
 
-	let title, content;
+	let creatingPost = false;
+	let posts = [];
+	const toggleCreate = () => (creatingPost = !creatingPost);
 
-	async function publishPost() {
-		let postsRef = collection(db, "posts");
-		await addDoc(postsRef, {
-			title,
-			content,
-			postID: uuidv4(),
-			pos: new Date(),
-			postReadBy: [],
-		});
-	}
-
-	function resizeTextArea() {
-		this.style.height = "auto";
-		this.style.height = `${this.scrollHeight}px`;
-	}
+	let postsRef = collection(db, "posts");
+	onSnapshot(postsRef, (snapShot) => {
+		posts = snapShot.docs;
+	});
 </script>
 
-<form on:submit|preventDefault={publishPost}>
-	<input type="text" bind:value={title} />
-	<textarea
-		placeholder="Take a note..."
-		name="content"
-		rows="8"
-		class="modal-content"
-		bind:value={content}
-		on:input={resizeTextArea}
-	/>
-	<button> Publish Post </button>
-</form>
+{#if creatingPost}
+	<CreatePost {toggleCreate} />
+{:else}
+	<div class="posts" transition:fly={{ x: -200, duration: 500 }}>
+		<h3 class="posts__heading">Posts</h3>
+
+		<section class="posts__list">
+			{#each posts as post (post.id)}
+				<article>
+					<div class="main">
+						<h1>{post.data().title}</h1>
+					</div>
+
+					<div class="supplementary">
+						<span class="edit-post" on:click> Edit </span>
+						<span class="view-post" on:click> View </span>
+					</div>
+				</article>
+			{/each}
+		</section>
+
+		<div class="create-post">
+			<button on:click={toggleCreate}>
+				<PlusIcon width={"12px"} height={"12px"} />
+				<span>Create New Post</span>
+			</button>
+		</div>
+	</div>
+{/if}
 
 <style lang="scss">
-	form {
-		width: 100%;
-		max-width: 400px;
-		padding: 20px;
-		margin: auto;
-		@include border;
+	.posts {
+		// @include border;
+		padding: 20px 20px 90px;
 
-		input,
-		textarea {
-			@include border($color: $light-gray);
-			@extend %form-reset;
-			border-radius: $little-radius;
-			font-size: $small;
-			padding: 10px;
+		&__heading {
+			font-size: $big;
 			margin-bottom: 10px;
-			width: 90%;
+			font-weight: $semibold;
 		}
+	}
+
+	article {
+		max-width: 400px;
+		background: white;
+		@include border($color: $blue);
+		border-radius: $basic-radius;
+		margin: 0 auto 20px;
+
+		.main {
+			width: 100%;
+			padding: 20px;
+			border-bottom: 1px solid $light-gray;
+
+			h1 {
+				font-weight: $semibold;
+				color: $dark;
+			}
+		}
+
+		.supplementary {
+			padding: 20px;
+			@include flex($justify: space-between);
+		}
+	}
+
+	.create-post {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+
+		height: 80px;
+		width: 100%;
+		@include flex($justify: flex-end);
+		// @include border;
 
 		button {
-			@extend %form-reset;
-			padding: 10px;
+			padding: 15px 30px 15px 15px;
 			background: $blue;
-			border-radius: $little-radius;
-			color: white;
-			width: 90%;
-			font-size: $small;
-		}
+			border-top-left-radius: $basic-radius;
+			border-bottom-left-radius: $basic-radius;
+			@include flex;
 
-		textarea {
-			font-family: $main-font;
+			span {
+				display: block;
+				margin-left: 5px;
+				color: white;
+				font-size: $small;
+				font-family: $main-font;
+			}
 		}
 	}
 </style>

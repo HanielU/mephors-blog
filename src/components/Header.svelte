@@ -15,11 +15,16 @@
 <style lang="scss">
 	header {
 		width: 100%;
+		background: white;
 		height: 80px;
-		margin-bottom: 80px;
+		margin-bottom: 10px;
 		font-family: $main-font;
 		padding: 0 20px;
-		@include border;
+		border-bottom: 1px solid $dark;
+		position: sticky;
+		top: 0;
+		left: 0;
+		// @include border;
 		@include flex($justify: space-between);
 
 		button {

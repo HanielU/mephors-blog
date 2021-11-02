@@ -33,9 +33,6 @@
 {/if}
 
 <style lang="scss">
-	$light: #f5f5f5;
-	$dark: #121212;
-
 	article {
 		max-width: 400px;
 		background: white;

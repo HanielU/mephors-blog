@@ -13,6 +13,13 @@
 	$: console.log({ user, unsubscribe });
 </script>
 
+<svelte:head>
+	<link
+		rel="stylesheet"
+		href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css"
+	/>
+</svelte:head>
+
 {#if user}
 	<Header {user} />
 

@@ -13,7 +13,8 @@
 	import PostPreview from "./PostPreview.svelte";
 	import { onMount } from "svelte";
 
-	let postID = "";
+	let postID = "",
+		usedPostID = "";
 
 	let user,
 		searchedPost,
@@ -30,18 +31,19 @@
 	// onMount(searchPosts);
 
 	async function searchPosts() {
-		if (!postID) return;
+		if (!postID.trim()) return;
 		searchedPost = null; // resets searched Posts
 		let postsRef = collection(db, "posts"); // creates posts reference
 		let postQuery = query(
 			postsRef,
-			where("postID", "==", postID.toLowerCase())
+			where("postID", "==", postID.trim().toLowerCase())
 		); // queries db for post with postID
 		searchStarted = true; // for loading animation?
 		let querySnapShot = await getDocs(postQuery);
 		searchStarted = false;
 		if (querySnapShot.empty) {
 			queryNotFound = true;
+			usedPostID = postID;
 			return;
 		}
 		querySnapShot.forEach((doc) => (searchedPost = doc));
@@ -77,7 +79,7 @@
 {:else if !searchStarted && searchedPost}
 	<PostPreview {searchedPost} {postRead} on:read={handleDispatch} />
 {:else if !searchStarted && queryNotFound}
-	<p class="err">Nothing Found.</p>
+	<p class="err">Post with ID: "{usedPostID}" not found</p>
 {/if}
 
 <style lang="scss">
