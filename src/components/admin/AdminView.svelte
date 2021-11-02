@@ -2,14 +2,18 @@
 	import { db } from "../../firebase.js";
 	import { collection, onSnapshot } from "firebase/firestore";
 	import { fly } from "svelte/transition";
+	import { setContext } from "svelte";
 	import CreatePost from "./CreatePost.svelte";
 	import PlusIcon from "../svgs/PlusIcon.svelte";
 
 	let creatingPost = false;
-	let transitioning = true; //set to true because onMount, the "onoutroend" event runs toggleCreate
+	let transitioning = true; //set to true because on Mount, the "onoutroend" event runs toggleCreate
 	let posts = [];
 	const toggleCreate = () => (creatingPost = !creatingPost);
 	const create = () => (transitioning = true);
+
+	$: gettingPosts = posts.length > 0 ? false : true;
+	setContext("toggleCreate", toggleCreate);
 
 	let postsRef = collection(db, "posts");
 	onSnapshot(postsRef, (snapShot) => {
@@ -18,30 +22,39 @@
 </script>
 
 {#if creatingPost}
-	<CreatePost {toggleCreate} />
+	<CreatePost />
 {:else}
 	<div
 		class="posts"
-		transition:fly={{ x: -200, duration: 500 }}
+		in:fly={{ delay: 200, x: -200, duration: 500 }}
+		out:fly={{ x: -200, duration: 500 }}
 		on:introstart={() => (transitioning = true)}
 		on:introend={() => (transitioning = false)}
 	>
 		<h3 class="posts__heading">Posts</h3>
 
-		<section class="posts__list">
-			{#each posts as post (post.id)}
-				<article>
-					<div class="main">
-						<h1>{post.data().title}</h1>
-					</div>
+		{#if gettingPosts}
+			<p>Loading Please Wait</p>
+		{:else}
+			<section class="posts__list" in:fly={{ x: -200, duration: 250 }}>
+				{#each posts as post (post.id)}
+					<article>
+						<span class="id">
+							ID: {post.data().postID}
+						</span>
 
-					<div class="supplementary">
-						<span class="edit-post" on:click> Edit </span>
-						<span class="view-post" on:click> View </span>
-					</div>
-				</article>
-			{/each}
-		</section>
+						<div class="main">
+							<h1>{post.data().title}</h1>
+						</div>
+
+						<div class="supplementary">
+							<span class="edit-post" on:click> Edit </span>
+							<span class="view-post" on:click> View </span>
+						</div>
+					</article>
+				{/each}
+			</section>
+		{/if}
 
 		{#if !transitioning}
 			<div
@@ -77,9 +90,16 @@
 		border-radius: $basic-radius;
 		margin: 0 auto 20px;
 
+		.id {
+			font-size: $smallest - 2px;
+			color: $light-gray;
+			padding: 10px 5px 0px 20px;
+			display: block;
+		}
+
 		.main {
 			width: 100%;
-			padding: 20px;
+			padding: 5px 20px 20px;
 			border-bottom: 1px solid $light-gray;
 
 			h1 {
@@ -89,7 +109,7 @@
 		}
 
 		.supplementary {
-			padding: 20px;
+			padding: 10px 20px 20px;
 			@include flex($justify: space-between);
 		}
 	}

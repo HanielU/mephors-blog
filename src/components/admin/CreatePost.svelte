@@ -3,9 +3,10 @@
 	import { collection, addDoc } from "firebase/firestore";
 	import { v4 as uuidv4 } from "uuid";
 	import { fly } from "svelte/transition";
+	import { getContext } from "svelte";
 
 	let title, content;
-	export let toggleCreate;
+	const toggleCreate = getContext("toggleCreate");
 
 	async function publishPost() {
 		let postsRef = collection(db, "posts");
@@ -29,7 +30,8 @@
 <div class="create-post-form" on:click|self={toggleCreate}>
 	<form
 		on:submit|preventDefault={publishPost}
-		transition:fly={{ x: 200, duration: 500 }}
+		in:fly={{ delay: 200, x: 200, duration: 500 }}
+		out:fly={{ x: 200, duration: 500 }}
 	>
 		<input type="text" bind:value={title} />
 		<textarea
