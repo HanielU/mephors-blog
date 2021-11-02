@@ -6,6 +6,7 @@
 	import PlusIcon from "../svgs/PlusIcon.svelte";
 
 	let creatingPost = false;
+	let transitioning = false;
 	let posts = [];
 	const toggleCreate = () => (creatingPost = !creatingPost);
 
@@ -18,7 +19,12 @@
 {#if creatingPost}
 	<CreatePost {toggleCreate} />
 {:else}
-	<div class="posts" transition:fly={{ x: -200, duration: 500 }}>
+	<div
+		class="posts"
+		transition:fly={{ x: -200, duration: 500 }}
+		on:introstart={() => (transitioning = true)}
+		on:introend={() => (transitioning = false)}
+	>
 		<h3 class="posts__heading">Posts</h3>
 
 		<section class="posts__list">
@@ -36,12 +42,14 @@
 			{/each}
 		</section>
 
-		<div class="create-post">
-			<button on:click={toggleCreate}>
-				<PlusIcon width={"12px"} height={"12px"} />
-				<span>Create New Post</span>
-			</button>
-		</div>
+		{#if !transitioning}
+			<div class="create-post" in:fly={{ x: 300, duration: 250 }}>
+				<button on:click={toggleCreate}>
+					<PlusIcon width={"12px"} height={"12px"} />
+					<span>Create New Post</span>
+				</button>
+			</div>
+		{/if}
 	</div>
 {/if}
 
