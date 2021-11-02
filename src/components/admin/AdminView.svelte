@@ -6,9 +6,10 @@
 	import PlusIcon from "../svgs/PlusIcon.svelte";
 
 	let creatingPost = false;
-	let transitioning = false;
+	let transitioning = true; //set to true because onMount, the "onoutroend" event runs toggleCreate
 	let posts = [];
 	const toggleCreate = () => (creatingPost = !creatingPost);
+	const create = () => (transitioning = true);
 
 	let postsRef = collection(db, "posts");
 	onSnapshot(postsRef, (snapShot) => {
@@ -43,8 +44,12 @@
 		</section>
 
 		{#if !transitioning}
-			<div class="create-post" in:fly={{ x: 300, duration: 250 }}>
-				<button on:click={toggleCreate}>
+			<div
+				class="create-post"
+				transition:fly={{ x: 200, duration: 200 }}
+				on:outroend={toggleCreate}
+			>
+				<button on:click={create}>
 					<PlusIcon width={"12px"} height={"12px"} />
 					<span>Create New Post</span>
 				</button>

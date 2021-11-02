@@ -6,7 +6,7 @@
 <header>
 	<div class="greeting">
 		<h3>
-			Welcome {user.displayName.split(" ")[1]}
+			Welcome {user.displayName.split(" ")[0]}
 		</h3>
 	</div>
 	<button on:click={logout}> logout </button>
