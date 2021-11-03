@@ -1,7 +1,7 @@
 <script>
 	import { db } from "../../firebase.js";
 	import { collection, onSnapshot } from "firebase/firestore";
-	import { fly } from "svelte/transition";
+	import { fly, slide } from "svelte/transition";
 	import { setContext } from "svelte";
 	import CreatePost from "./CreatePost.svelte";
 	import PlusIcon from "../svgs/PlusIcon.svelte";
@@ -36,11 +36,15 @@
 		{#if gettingPosts}
 			<p>Loading Please Wait</p>
 		{:else}
-			<section class="posts__list" in:fly={{ x: -200, duration: 250 }}>
+			<section class="posts__list" in:fly={{ x: -200, duration: 800 }}>
 				{#each posts as post (post.id)}
-					<article>
+					<article in:slide={{ duration: 350 }}>
 						<span class="id">
 							ID: {post.data().postID}
+						</span>
+
+						<span class="views">
+							Views: {post.data().postReadBy.length}
 						</span>
 
 						<div class="main">
@@ -72,6 +76,11 @@
 {/if}
 
 <style lang="scss">
+	%width-settings {
+		max-width: 400px;
+		margin: 0 auto;
+	}
+
 	.posts {
 		// @include border;
 		padding: 20px 20px 90px;
@@ -80,21 +89,35 @@
 			font-size: $big;
 			margin-bottom: 10px;
 			font-weight: $semibold;
+			@extend %width-settings;
+		}
+
+		&__list {
+			@extend %width-settings;
 		}
 	}
 
 	article {
-		max-width: 400px;
+		width: 100%;
 		background: white;
 		@include border($color: $blue);
 		border-radius: $basic-radius;
-		margin: 0 auto 20px;
+		margin-bottom: 20px;
 
-		.id {
+		%span-settings {
 			font-size: $smallest - 2px;
 			color: $light-gray;
-			padding: 10px 5px 0px 20px;
 			display: block;
+		}
+
+		.id {
+			@extend %span-settings;
+			padding: 10px 5px 0px 20px;
+		}
+
+		.views {
+			@extend %span-settings;
+			padding: 0 20px;
 		}
 
 		.main {
