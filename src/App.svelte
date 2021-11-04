@@ -8,9 +8,10 @@
 
 	let user;
 	let adminId = "bFkZyf72TuSoZe60AZxOtUDMyyY2";
+	$: userIsAdmin = user ? user.uid === adminId : false;
 
-	const unsubscribe = authState(auth).subscribe((usr) => (user = usr));
-	$: console.log({ user, unsubscribe });
+	authState(auth).subscribe((usr) => (user = usr));
+	$: console.log({ user });
 </script>
 
 <svelte:head>
@@ -23,7 +24,7 @@
 {#if user}
 	<Header {user} />
 
-	{#if user.uid === adminId}
+	{#if userIsAdmin}
 		<AdminView />
 	{:else}
 		<SearchBlog />

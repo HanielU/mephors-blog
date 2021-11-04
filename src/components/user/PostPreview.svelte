@@ -29,7 +29,7 @@
 		</div>
 	</article>
 {:else}
-	<Post {searchedPost} {postRead} />
+	<Post {searchedPost} {postRead} on:read={(e) => dispatch("read", e.detail)} />
 {/if}
 
 <style lang="scss">
