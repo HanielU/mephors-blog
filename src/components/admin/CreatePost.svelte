@@ -33,9 +33,7 @@
 		in:fly={{ delay: 200, x: 200, duration: 500 }}
 		out:fly={{ x: 200, duration: 500 }}
 	>
-		<div class="title-area">
-			<textarea type="text" bind:value={title} />
-		</div>
+		<input type="text" bind:value={title} />
 		<textarea
 			placeholder="Take a note..."
 			name="content"
@@ -60,10 +58,12 @@
 	form {
 		width: 100%;
 		max-width: 400px;
+		padding: 20px;
 		margin: auto;
 		@include border;
 
-		/* textarea {
+		input,
+		textarea {
 			@include border($color: $light-gray);
 			@extend %form-reset;
 			border-radius: $little-radius;
@@ -71,23 +71,6 @@
 			padding: 10px;
 			margin-bottom: 10px;
 			width: 90%;
-		} */
-
-		.title-area {
-			width: 100%;
-			padding: 30px 30px 20px;
-			border-bottom: 1px solid $gray;
-			@include flex($justify: flex-start);
-
-			textarea {
-				height: 100%;
-				width: 100%;
-				font-size: $mid;
-				font-family: $main-font;
-				color: #535968;
-				font-weight: $bold;
-				text-transform: capitalize;
-			}
 		}
 
 		button {
