@@ -8,7 +8,8 @@
 	let title,
 		content,
 		postData,
-		publishing = false;
+		publishing = false,
+		actionStatement = "Save Edit";
 	const toggleEdit = getContext("toggleEdit");
 
 	let postRef = doc(db, "posts", id);
@@ -21,13 +22,13 @@
 	onDestroy(unsubscribe);
 
 	async function publishPost() {
-		publishing = true;
+		actionStatement = "Saving Edit...";
 		await updateDoc(postRef, {
 			title,
 			content,
 		});
-		publishing = false;
-		toggleEdit();
+		actionStatement = "Done!";
+		setTimeout(toggleEdit, 500);
 	}
 
 	function resizeTextArea() {
@@ -51,7 +52,7 @@
 			bind:value={content}
 			on:input={resizeTextArea}
 		/>
-		<button> {!publishing ? "Publish Post" : "Publishing"} </button>
+		<button> {actionStatement} </button>
 
 		<span class="close" on:click|self={toggleEdit}> Close </span>
 	</form>

@@ -1,24 +1,27 @@
 <script>
 	import { db } from "../../firebase.js";
 	import { collection, addDoc } from "firebase/firestore";
-	import { v4 as uuidv4 } from "uuid";
+	import ShortUniqueId from "short-unique-id";
 	import { fly } from "svelte/transition";
 	import { getContext } from "svelte";
 
-	let title, content;
+	let title,
+		content,
+		actionStatement = "Publish";
 	const toggleCreate = getContext("toggleCreate");
 
 	async function publishPost() {
 		let postsRef = collection(db, "posts");
+		actionStatement = "Publishing...";
 		await addDoc(postsRef, {
 			title,
 			content,
-			postID: uuidv4(),
+			postID: new ShortUniqueId({ length: 8 })(),
 			pos: new Date(),
 			postReadBy: [],
 		});
-
-		toggleCreate();
+		actionStatement = "Done!";
+		setTimeout(toggleCreate, 500);
 	}
 
 	function resizeTextArea() {
@@ -42,7 +45,7 @@
 			bind:value={content}
 			on:input={resizeTextArea}
 		/>
-		<button> Publish Post </button>
+		<button> {actionStatement} </button>
 
 		<span class="close" on:click|self={toggleCreate}> Close </span>
 	</form>

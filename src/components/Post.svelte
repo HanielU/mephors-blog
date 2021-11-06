@@ -1,19 +1,34 @@
 <script>
 	import { db } from "../firebase.js";
-	import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
-	import { getContext, onDestroy } from "svelte";
+	import {
+		doc,
+		onSnapshot,
+		updateDoc,
+		arrayUnion,
+		deleteDoc,
+	} from "firebase/firestore";
+	import { getContext, onDestroy, onMount } from "svelte";
 	import { slide, fade } from "svelte/transition";
 	import { user, showPost } from "../utils/store";
 
+	onMount(() => {
+		new ClipboardJS(".copy");
+	});
+
 	let postData,
 		title = "loading...",
-		content = "loading...";
+		content = "loading...",
+		postID = "",
+		actionStatement = "Delete";
 
 	let postRef = doc(db, "posts", $showPost.postID);
 	let unsubscribe = onSnapshot(postRef, (data) => {
-		postData = data.data();
-		title = postData.title;
-		content = postData.content;
+		if (data.exists) {
+			postData = data.data();
+			title = postData.title;
+			content = postData.content;
+			postID = postData.postID;
+		}
 	});
 	onDestroy(unsubscribe);
 
@@ -21,6 +36,10 @@
 	const checkRead = getContext("checkRead");
 
 	$: checkRead(postData);
+
+	const hidePost = () => {
+		$showPost = { value: false, calledBy: null, postID: null };
+	};
 
 	async function confirmRead(e) {
 		$postRead = false;
@@ -31,22 +50,26 @@
 			});
 			$postRead = true;
 		}
-		e.target.checked = $postRead;
+		e.target.checked = $postRead; // necessary because checkboxes don't play fair
+	}
+
+	async function deletePost() {
+		if (confirm("Are you sure you want to delete this post?")) {
+			unsubscribe();
+			actionStatement = "Deleting...";
+			await deleteDoc(postRef);
+			actionStatement = "Done!";
+			setTimeout(hidePost, 500);
+		}
 	}
 </script>
 
 <div class="bg" transition:fade={{ duration: 300 }}>
 	<article class="post" transition:slide>
-		<span
-			class="close"
-			title="close"
-			on:click={() =>
-				($showPost = { value: false, calledBy: null, postID: null })}
-		>
-			x
-		</span>
+		<span class="close" title="close" on:click={hidePost}> x </span>
 		<h1>
 			{title}
+			<span class="copy" data-clipboard-text={postID}> Copy ID </span>
 		</h1>
 		<p>
 			{content}
@@ -66,11 +89,25 @@
 			{:else}
 				<h4>You have read this post</h4>
 			{/if}
+		{:else if $showPost.calledBy === "admin"}
+			<span class="del" on:click|self={deletePost}> {actionStatement} </span>
 		{/if}
 	</article>
 </div>
 
 <style lang="scss">
+	.del {
+		width: 90%;
+		margin: 10px auto;
+		padding: 15px;
+		background: #e52929;
+		color: white;
+		font-weight: $semibold;
+		border-radius: $little-radius;
+		cursor: pointer;
+		text-align: center;
+	}
+
 	.bg {
 		position: fixed;
 		height: 100vh;
@@ -92,6 +129,29 @@
 		width: 500px;
 		padding: 20px;
 		background: #fff;
+
+		h1 {
+			max-width: 30ch;
+			@include flex($justify: space-between, $align: flex-start);
+			flex-direction: column;
+
+			.copy {
+				display: block;
+				font-size: $smallest;
+				padding: 6px 12px;
+				margin-top: 10px;
+				max-width: fit-content;
+				color: #333;
+				cursor: pointer;
+				background-color: #eee;
+				background-image: linear-gradient(#fcfcfc, #eee);
+				border: 1px solid #d5d5d5;
+				border-radius: 3px;
+				user-select: none;
+				-webkit-appearance: none;
+			}
+		}
+
 		p {
 			overflow-y: auto;
 			max-height: 100%;
@@ -103,14 +163,17 @@
 		position: absolute;
 		right: 0;
 		top: 0;
-		background: rgb(195, 53, 53);
+		background: #df5555;
+		color: #333;
+		font-weight: $semibold;
 		padding: 8px 15px;
 		border-top-right-radius: $little-radius - 3px;
 		cursor: pointer;
 	}
 
 	label,
-	h4 {
+	h4,
+	.del {
 		margin-top: auto;
 	}
 </style>
