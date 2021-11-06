@@ -30,7 +30,7 @@
 	}
 </script>
 
-<div class="create-post-form" on:click|self={toggleCreate}>
+<div class="create-post-form">
 	<form
 		on:submit|preventDefault={publishPost}
 		in:fly={{ delay: 200, x: 200, duration: 500 }}

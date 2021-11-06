@@ -8,7 +8,6 @@
 	let title,
 		content,
 		postData,
-		publishing = false,
 		actionStatement = "Save Edit";
 	const toggleEdit = getContext("toggleEdit");
 
@@ -37,7 +36,7 @@
 	}
 </script>
 
-<div class="edit-post-form" on:click|self={toggleEdit}>
+<div class="edit-post-form">
 	<form
 		on:submit|preventDefault={publishPost}
 		in:fly={{ delay: 200, x: 200, duration: 500 }}

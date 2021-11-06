@@ -69,7 +69,10 @@
 		<span class="close" title="close" on:click={hidePost}> x </span>
 		<h1>
 			{title}
-			<span class="copy" data-clipboard-text={postID}> Copy ID </span>
+
+			{#if $showPost.calledBy === "admin"}
+				<span class="copy" data-clipboard-text={postID}> Copy ID </span>
+			{/if}
 		</h1>
 		<p>
 			{content}
@@ -115,6 +118,7 @@
 		top: 0;
 		left: 0;
 		z-index: 2;
+		padding: 0 14px;
 		background: #eee;
 		@include flex;
 	}
@@ -125,7 +129,7 @@
 		flex-direction: column;
 		border-radius: $little-radius;
 		position: relative;
-		height: 500px;
+		height: 80vh;
 		width: 500px;
 		padding: 20px;
 		background: #fff;
@@ -140,7 +144,6 @@
 				font-size: $smallest;
 				padding: 6px 12px;
 				margin-top: 10px;
-				max-width: fit-content;
 				color: #333;
 				cursor: pointer;
 				background-color: #eee;
