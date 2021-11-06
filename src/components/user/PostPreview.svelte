@@ -1,35 +1,36 @@
 <script>
-	import { createEventDispatcher, setContext } from "svelte";
+	import { getContext, setContext } from "svelte";
 	import { showPost } from "../../utils/store";
 	import Post from "../Post.svelte";
 
-	export let searchedPost, postRead;
-	const dispatch = createEventDispatcher();
-	const openPost = (bool) => ($showPost = bool);
+	export let searchedPost;
+
+	const postRead = getContext("postRead");
+
+	const openPost = (id) =>
+		($showPost = { value: true, calledBy: "user", postID: id });
+
+	$: console.log(searchedPost);
 
 	setContext("openPost", openPost);
-
-	/* $: if (postRead) {
-		dispatch("read", postRead);
-	} */
 </script>
 
-{#if searchedPost && !$showPost}
+{#if searchedPost && !$showPost.value}
 	<article>
 		<div class="main">
 			<h1>{searchedPost.data().title}</h1>
 		</div>
 
 		<div class="supplementary">
-			<span class:postRead>
-				{!postRead ? "Not read" : "Read"}
+			<span class:postRead={$postRead}>
+				{!$postRead ? "Not read" : "Read"}
 			</span>
 
-			<span class="view-post" on:click={() => openPost(true)}> View </span>
+			<span class="view-post" on:click={() => openPost(searchedPost.id)}>
+				View
+			</span>
 		</div>
 	</article>
-{:else}
-	<Post {searchedPost} {postRead} on:read={(e) => dispatch("read", e.detail)} />
 {/if}
 
 <style lang="scss">

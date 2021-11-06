@@ -1,6 +1,7 @@
 <script>
-	import { createEventDispatcher, getContext } from "svelte";
+	import { createEventDispatcher, getContext, onMount } from "svelte";
 	import { fly, fade } from "svelte/transition";
+	import { showPost } from "../../utils/store";
 	import PlusIcon from "../svgs/PlusIcon.svelte";
 
 	export let posts = [];
@@ -9,15 +10,19 @@
 
 	let action = "",
 		actionId = "",
-		runDelayedEV;
+		delayedEV;
 
 	const toggleCreate = getContext("toggleCreate");
 
+	onMount(() => {
+		new ClipboardJS(".id");
+	});
+
 	$: gettingPosts = posts.length > 0 ? false : true;
 	$: if (action === "create") {
-		runDelayedEV = toggleCreate;
+		delayedEV = toggleCreate;
 	} else {
-		runDelayedEV = dispatch(action, actionId);
+		delayedEV = editCurrentPost(actionId);
 	}
 
 	const setAction = (act, id) => {
@@ -28,7 +33,17 @@
 		}
 	};
 
-	$: console.log({ transitioning });
+	function editCurrentPost(id) {
+		dispatch("edit", id);
+	}
+
+	function showCurrentPost(id) {
+		$showPost = {
+			value: true,
+			calledBy: "admin",
+			postID: id,
+		};
+	}
 </script>
 
 <div
@@ -46,7 +61,14 @@
 		<section class="posts__list" in:fade={{ duration: 500 }}>
 			{#each posts as post (post.id)}
 				<article>
-					<span class="id">
+					<span
+						class="id"
+						data-clipboard-text={post.data().postID}
+						title="Copy Id"
+						on:click={function copied() {
+							this.title = "copied";
+						}}
+					>
 						ID: {post.data().postID}
 					</span>
 
@@ -62,7 +84,7 @@
 						<span class="edit-post" on:click={() => setAction("edit", post.id)}>
 							Edit
 						</span>
-						<span class="view-post" on:click={() => setAction("view", post.id)}>
+						<span class="view-post" on:click={() => showCurrentPost(post.id)}>
 							View
 						</span>
 					</div>
@@ -75,7 +97,7 @@
 		<div
 			class="create-post"
 			transition:fly={{ x: 200, duration: 200 }}
-			on:outroend={runDelayedEV}
+			on:outroend={delayedEV}
 		>
 			<button on:click={() => setAction("create")}>
 				<PlusIcon width={"12px"} height={"12px"} />
@@ -116,12 +138,12 @@
 		%span-settings {
 			font-size: $smallest - 2px;
 			color: $light-gray;
-			display: block;
 		}
 
 		.id {
 			@extend %span-settings;
 			padding: 10px 5px 0px 20px;
+			cursor: pointer;
 		}
 		.views {
 			@extend %span-settings;

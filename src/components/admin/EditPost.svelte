@@ -2,24 +2,31 @@
 	import { db } from "../../firebase.js";
 	import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 	import { fly } from "svelte/transition";
-	import { getContext } from "svelte";
+	import { getContext, onDestroy } from "svelte";
 
 	export let id;
-	let title, content, postData;
+	let title,
+		content,
+		postData,
+		publishing = false;
 	const toggleEdit = getContext("toggleEdit");
 
 	let postRef = doc(db, "posts", id);
-	onSnapshot(postRef, (data) => {
+	let unsubscribe = onSnapshot(postRef, (data) => {
 		postData = data.data();
 		title = postData.title;
 		content = postData.content;
 	});
 
+	onDestroy(unsubscribe);
+
 	async function publishPost() {
+		publishing = true;
 		await updateDoc(postRef, {
 			title,
 			content,
 		});
+		publishing = false;
 		toggleEdit();
 	}
 
@@ -44,11 +51,25 @@
 			bind:value={content}
 			on:input={resizeTextArea}
 		/>
-		<button> Publish Post </button>
+		<button> {!publishing ? "Publish Post" : "Publishing"} </button>
+
+		<span class="close" on:click|self={toggleEdit}> Close </span>
 	</form>
 </div>
 
 <style lang="scss">
+	.close {
+		width: 90%;
+		margin: 10px auto;
+		padding: 15px;
+		background: red;
+		color: white;
+		font-weight: $semibold;
+		border-radius: $little-radius;
+		cursor: pointer;
+		text-align: center;
+	}
+
 	.edit-post-form {
 		position: fixed;
 		top: 90px;

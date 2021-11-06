@@ -1,34 +1,21 @@
 <script>
-	import { auth, db } from "../../firebase";
-	import { authState } from "rxfire/auth";
-	import {
-		collection,
-		query,
-		where,
-		getDocs,
-		doc,
-		updateDoc,
-		arrayUnion,
-	} from "firebase/firestore";
+	import { db } from "../../firebase";
+	import { collection, query, where, getDocs } from "firebase/firestore";
+	import { user } from "../../utils/store";
 	import PostPreview from "./PostPreview.svelte";
-	import { onMount } from "svelte";
+	import { getContext } from "svelte";
 
 	let postID = "",
 		usedPostID = "";
 
-	let user,
-		searchedPost,
+	let searchedPost,
 		searchStarted = false,
-		queryNotFound = false,
-		postRead = false;
+		queryNotFound = false;
 
-	const unsubscribe = authState(auth).subscribe((usr) => (user = usr));
+	const checkRead = getContext("checkRead");
+	const postRead = getContext("postRead");
 
-	$: if (postRead) {
-		addUserReadToDB();
-	}
-
-	// onMount(searchPosts);
+	$: searchedPost ? checkRead(searchedPost.data()) : ($postRead = false);
 
 	async function searchPosts() {
 		if (!postID.trim()) return;
@@ -47,25 +34,6 @@
 			return;
 		}
 		querySnapShot.forEach((doc) => (searchedPost = doc));
-
-		searchedPost.data().postReadBy.forEach((userID) => {
-			if (userID == user.uid) {
-				postRead = true;
-			}
-		});
-
-		console.log(searchedPost.data());
-	}
-
-	async function addUserReadToDB() {
-		let postsRef = doc(db, "posts", searchedPost.id);
-		await updateDoc(postsRef, {
-			postReadBy: arrayUnion(user.uid),
-		});
-	}
-
-	function handleDispatch(e) {
-		postRead = e.detail;
 	}
 </script>
 
@@ -77,7 +45,7 @@
 {#if searchStarted}
 	<p>loading, please wait</p>
 {:else if !searchStarted && searchedPost}
-	<PostPreview {searchedPost} {postRead} on:read={handleDispatch} />
+	<PostPreview {searchedPost} />
 {:else if !searchStarted && queryNotFound}
 	<p class="err">Post with ID: "{usedPostID}" not found</p>
 {/if}

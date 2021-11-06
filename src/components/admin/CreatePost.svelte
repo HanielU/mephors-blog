@@ -43,10 +43,24 @@
 			on:input={resizeTextArea}
 		/>
 		<button> Publish Post </button>
+
+		<span class="close" on:click|self={toggleCreate}> Close </span>
 	</form>
 </div>
 
 <style lang="scss">
+	.close {
+		width: 90%;
+		margin: 10px auto;
+		padding: 15px;
+		background: red;
+		color: white;
+		font-weight: $semibold;
+		border-radius: $little-radius;
+		cursor: pointer;
+		text-align: center;
+	}
+
 	.create-post-form {
 		position: fixed;
 		top: 90px;

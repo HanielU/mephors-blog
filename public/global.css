@@ -39,3 +39,7 @@ textarea {
 	max-height: 50vh;
 	width: 100%;
 }
+
+span {
+	display: block;
+}

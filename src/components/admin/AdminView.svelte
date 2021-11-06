@@ -1,51 +1,43 @@
 <script>
 	import { db } from "../../firebase.js";
-	import { collection, onSnapshot } from "firebase/firestore";
-	import { setContext } from "svelte";
+	import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
+	import { onDestroy, setContext } from "svelte";
 	import CreatePost from "./CreatePost.svelte";
 	import EditPost from "./EditPost.svelte";
-	import ViewPost from "./ViewPost.svelte";
 	import PostsList from "./PostsList.svelte";
 
+	// Default Initialisations
 	let creatingPost = false;
 	let posts, id;
 	let edit = false;
-	let view = false;
 
+	// Firestore related
+	let postsRef = collection(db, "posts");
+	let postsQuery = query(postsRef, orderBy("pos", "desc"));
+	let unsubscribe = onSnapshot(
+		postsQuery,
+		(snapShot) => (posts = snapShot.docs)
+	);
+	onDestroy(unsubscribe);
+
+	// Functions
 	const toggleCreate = () => (creatingPost = !creatingPost);
 	const toggleEdit = () => (edit = !edit);
-	const toggleView = () => (view = !view);
-
-	setContext("toggleCreate", toggleCreate);
-	setContext("toggleEdit", toggleEdit);
-	setContext("toggleView", toggleView);
-
-	let postsRef = collection(db, "posts");
-	onSnapshot(postsRef, (snapShot) => {
-		posts = snapShot.docs;
-	});
 
 	function handleEdit(e) {
 		toggleEdit();
 		id = e.detail;
-		console.log({ id });
 	}
 
-	function handleView(e) {
-		toggleView();
-		id = e.detail;
-		console.log({ id });
-	}
-
-	$: console.log({ edit, view, creatingPost });
+	// Context Setters
+	setContext("toggleCreate", toggleCreate);
+	setContext("toggleEdit", toggleEdit);
 </script>
 
 {#if creatingPost}
 	<CreatePost />
 {:else if edit}
 	<EditPost {id} />
-{:else if view}
-	<ViewPost {id} />
 {:else}
-	<PostsList {posts} on:edit={handleEdit} on:view={handleView} />
+	<PostsList {posts} on:edit={handleEdit} />
 {/if}

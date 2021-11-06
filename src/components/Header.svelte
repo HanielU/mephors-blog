@@ -1,12 +1,12 @@
 <script>
 	import { logout } from "../firebase";
-	export let user;
+	import { user } from "../utils/store";
 </script>
 
 <header>
 	<div class="greeting">
 		<h3>
-			Welcome {user.displayName.split(" ")[0]}
+			Welcome {$user.displayName.split(" ")[0]}
 		</h3>
 	</div>
 	<button on:click={logout}> logout </button>

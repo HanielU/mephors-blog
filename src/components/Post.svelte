@@ -1,19 +1,48 @@
 <script>
-	import { getContext, createEventDispatcher } from "svelte";
+	import { db } from "../firebase.js";
+	import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
+	import { getContext, onDestroy } from "svelte";
 	import { slide, fade } from "svelte/transition";
+	import { user, showPost } from "../utils/store";
 
-	export let searchedPost, postRead;
-	const dispatch = createEventDispatcher();
-	$: if (postRead) {
-		dispatch("read", postRead);
+	let postData,
+		title = "loading...",
+		content = "loading...";
+
+	let postRef = doc(db, "posts", $showPost.postID);
+	let unsubscribe = onSnapshot(postRef, (data) => {
+		postData = data.data();
+		title = postData.title;
+		content = postData.content;
+	});
+	onDestroy(unsubscribe);
+
+	const postRead = getContext("postRead");
+	const checkRead = getContext("checkRead");
+
+	$: checkRead(postData);
+
+	async function confirmRead(e) {
+		$postRead = false;
+		let sure = confirm("Are you sure you have read this post?");
+		if (sure) {
+			await updateDoc(postRef, {
+				postReadBy: arrayUnion($user.uid),
+			});
+			$postRead = true;
+		}
+		e.target.checked = $postRead;
 	}
-	let { title, content } = searchedPost.data();
-	const openPost = getContext("openPost");
 </script>
 
 <div class="bg" transition:fade={{ duration: 300 }}>
 	<article class="post" transition:slide>
-		<span class="close" title="close" on:click={() => openPost(false)}>
+		<span
+			class="close"
+			title="close"
+			on:click={() =>
+				($showPost = { value: false, calledBy: null, postID: null })}
+		>
 			x
 		</span>
 		<h1>
@@ -23,20 +52,27 @@
 			{content}
 		</p>
 
-		{#if !postRead}
-			<label for="checkIfPostRead">
-				<input type="checkbox" bind:checked={postRead} name="checkIfPostRead" />
-				I have read this post
-			</label>
-		{:else}
-			<h4>You have read this post</h4>
+		{#if $showPost.calledBy === "user"}
+			{#if !$postRead}
+				<label for="checkIfPostRead">
+					<input
+						type="checkbox"
+						checked={$postRead}
+						on:click={confirmRead}
+						name="checkIfPostRead"
+					/>
+					I have read this post
+				</label>
+			{:else}
+				<h4>You have read this post</h4>
+			{/if}
 		{/if}
 	</article>
 </div>
 
 <style lang="scss">
 	.bg {
-		position: absolute;
+		position: fixed;
 		height: 100vh;
 		width: 100%;
 		top: 0;
@@ -68,7 +104,7 @@
 		right: 0;
 		top: 0;
 		background: rgb(195, 53, 53);
-		padding: 3px 10px;
+		padding: 8px 15px;
 		border-top-right-radius: $little-radius - 3px;
 		cursor: pointer;
 	}
