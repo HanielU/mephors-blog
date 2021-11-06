@@ -21,10 +21,7 @@
 		if (!postID.trim()) return;
 		searchedPost = null; // resets searched Posts
 		let postsRef = collection(db, "posts"); // creates posts reference
-		let postQuery = query(
-			postsRef,
-			where("postID", "==", postID.trim().toLowerCase())
-		); // queries db for post with postID
+		let postQuery = query(postsRef, where("postID", "==", postID.trim())); // queries db for post with postID
 		searchStarted = true; // for loading animation?
 		let querySnapShot = await getDocs(postQuery);
 		searchStarted = false;
