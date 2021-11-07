@@ -1,7 +1,6 @@
 <script>
 	import { getContext, setContext } from "svelte";
 	import { showPost } from "../../utils/store";
-	import Post from "../Post.svelte";
 
 	export let searchedPost;
 
@@ -9,8 +8,6 @@
 
 	const openPost = (id) =>
 		($showPost = { value: true, calledBy: "user", postID: id });
-
-	$: console.log(searchedPost);
 
 	setContext("openPost", openPost);
 </script>

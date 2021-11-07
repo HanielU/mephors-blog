@@ -10,8 +10,11 @@
 	import { onDestroy, setContext } from "svelte";
 	import { writable } from "svelte/store";
 
-	let adminId = "bFkZyf72TuSoZe60AZxOtUDMyyY2";
-	$: userIsAdmin = $user ? $user.uid === adminId : false;
+	const adminId = [
+		"bFkZyf72TuSoZe60AZxOtUDMyyY2",
+		"0qtVIfsMEMZUngcJYx3tkii8S9a2",
+	];
+	$: userIsAdmin = $user ? adminId.includes($user.uid) : false;
 
 	const postRead = writable(false);
 

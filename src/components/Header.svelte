@@ -3,14 +3,16 @@
 	import { user } from "../utils/store";
 </script>
 
-<header>
-	<div class="greeting">
-		<h3>
-			Welcome {$user.displayName.split(" ")[0]}
-		</h3>
-	</div>
-	<button on:click={logout}> logout </button>
-</header>
+{#if $user}
+	<header>
+		<div class="greeting">
+			<h3>
+				Welcome {$user.displayName.split(" ")[0]}
+			</h3>
+		</div>
+		<button on:click={logout}> logout </button>
+	</header>
+{/if}
 
 <style lang="scss">
 	header {
