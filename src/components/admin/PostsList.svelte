@@ -22,7 +22,7 @@
 	$: if (action === "create") {
 		delayedEV = toggleCreate;
 	} else {
-		delayedEV = editCurrentPost(actionId);
+		delayedEV = () => editCurrentPost(actionId);
 	}
 
 	const setAction = (act, id) => {

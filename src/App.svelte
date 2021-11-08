@@ -2,22 +2,26 @@
 	import { auth } from "./firebase";
 	import { authState } from "rxfire/auth";
 	import { user, showPost } from "./utils/store";
+	import { onDestroy, setContext } from "svelte";
+	import { writable } from "svelte/store";
 	import SignIn from "./components/SignIn.svelte";
 	import Header from "./components/Header.svelte";
 	import Post from "./components/Post.svelte";
 	import SearchBlog from "./components/user/SearchBlog.svelte";
 	import AdminView from "./components/admin/AdminView.svelte";
-	import { onDestroy, setContext } from "svelte";
-	import { writable } from "svelte/store";
 
+	// Variable declarations
+	let unsub = authState(auth).subscribe((usr) => ($user = usr));
 	const adminId = [
 		"bFkZyf72TuSoZe60AZxOtUDMyyY2",
 		"0qtVIfsMEMZUngcJYx3tkii8S9a2",
 	];
-	$: userIsAdmin = $user ? adminId.includes($user.uid) : false;
-
 	const postRead = writable(false);
 
+	// Reactive
+	$: userIsAdmin = $user ? adminId.includes($user.uid) : false;
+
+	// Functions
 	function checkRead(data) {
 		if (!data) return;
 		data.postReadBy.forEach((userID) => {
@@ -27,11 +31,9 @@
 		});
 	}
 
+	onDestroy(() => unsub.unsubscribe());
 	setContext("postRead", postRead);
 	setContext("checkRead", checkRead);
-
-	let unsub = authState(auth).subscribe((usr) => ($user = usr));
-	onDestroy(() => unsub.unsubscribe());
 </script>
 
 <svelte:head>

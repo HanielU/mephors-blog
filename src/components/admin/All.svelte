@@ -1,15 +1,43 @@
 <script>
 	import { db } from "../../firebase.js";
-	import { collection, addDoc } from "firebase/firestore";
+	import {
+		onSnapshot,
+		collection,
+		doc,
+		addDoc,
+		updateDoc,
+	} from "firebase/firestore";
 	import ShortUniqueId from "short-unique-id";
 	import { fly } from "svelte/transition";
-	import { getContext } from "svelte";
+	import { getContext, onDestroy } from "svelte";
 
+	// Prop declarations
+	export let id,
+		edit = false,
+		creatingPost = false;
+
+	// Variable declarations
 	let title,
 		content,
-		actionStatement = "Publish";
-	const toggleCreate = getContext("toggleCreate");
+		postData,
+		actionStatement = edit ? "Save Edit" : "Publish";
 
+	const toggleCreate = getContext("toggleCreate");
+	const toggleEdit = getContext("toggleEdit");
+
+	let postRef;
+
+	if (edit) {
+		postRef = doc(db, "posts", id);
+		let unsubscribe = onSnapshot(postRef, (data) => {
+			postData = data.data();
+			title = postData.title;
+			content = postData.content;
+		});
+		onDestroy(unsubscribe);
+	}
+
+	// Functions
 	async function publishPost() {
 		let postsRef = collection(db, "posts");
 		actionStatement = "Publishing...";
@@ -24,15 +52,29 @@
 		setTimeout(toggleCreate, 500);
 	}
 
+	async function publishEdit() {
+		actionStatement = "Saving Edit...";
+		await updateDoc(postRef, {
+			title,
+			content,
+		});
+		actionStatement = "Done!";
+		setTimeout(toggleEdit, 500);
+	}
+
+	const handleSubmit = () => (edit ? publishEdit() : publishPost());
+
+	const toggleForm = () => (edit ? toggleEdit() : toggleCreate());
+
 	function resizeTextArea() {
 		this.style.height = "auto";
 		this.style.height = `${this.scrollHeight}px`;
 	}
 </script>
 
-<div class="create-post-form">
+<div class="form-wrapper">
 	<form
-		on:submit|preventDefault={publishPost}
+		on:submit|preventDefault={handleSubmit}
 		in:fly={{ delay: 200, x: 200, duration: 500 }}
 		out:fly={{ x: 200, duration: 500 }}
 	>
@@ -47,7 +89,7 @@
 		/>
 		<button> {actionStatement} </button>
 
-		<span class="close" on:click|self={toggleCreate}> Close </span>
+		<span class="close" on:click|self={toggleForm}> Close </span>
 	</form>
 </div>
 
@@ -64,7 +106,7 @@
 		text-align: center;
 	}
 
-	.create-post-form {
+	.form-wrapper {
 		position: fixed;
 		top: 90px;
 		left: 0;

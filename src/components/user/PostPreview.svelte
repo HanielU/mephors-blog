@@ -2,10 +2,13 @@
 	import { getContext, setContext } from "svelte";
 	import { showPost } from "../../utils/store";
 
+	// Prop declaration
 	export let searchedPost;
 
+	// Context getter
 	const postRead = getContext("postRead");
 
+	// Functions
 	const openPost = (id) =>
 		($showPost = { value: true, calledBy: "user", postID: id });
 
