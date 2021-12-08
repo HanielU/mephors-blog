@@ -1,0 +1,84 @@
+.bg {
+	@extend %background;
+	padding: 0;
+	@include flex;
+}
+
+.post {
+	@include flex($justify: flex-start, $align: flex-start);
+	flex-direction: column;
+	position: relative;
+	height: 100%;
+	width: 100%;
+	background: #fff;
+	border-radius: $little-radius;
+
+	&__header {
+		width: 100%;
+		padding: 20px 20px 0px;
+
+		@include flex($justify: space-between, $align: flex-start);
+
+		.close {
+			background: #eb5e5e;
+			padding: 12px;
+			border-radius: $little-radius - 2px;
+			cursor: pointer;
+			// background: #df5555;
+		}
+	}
+
+	h1 {
+		max-width: 30ch;
+		@include flex($justify: space-between, $align: flex-start);
+		flex-direction: column;
+
+		.copy {
+			display: block;
+			font-size: $smallest;
+			padding: 6px 12px;
+			margin-top: 10px;
+			color: #333;
+			cursor: pointer;
+			background-color: #eee;
+			background-image: linear-gradient(#fcfcfc, #eee);
+			border: 1px solid #d5d5d5;
+			border-radius: 3px;
+			user-select: none;
+			-webkit-appearance: none;
+		}
+	}
+
+	p {
+		overflow-y: auto;
+		max-height: 100%;
+		margin: 20px 0;
+		padding: 0 20px;
+
+		padding-bottom: 90px;
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
+
+		@extend %scrollbar;
+	}
+
+	.action-wrapper {
+		background: inherit;
+
+		width: 100%;
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		padding: 30px 20px;
+	}
+
+	.del {
+		padding: 15px;
+		background: #e52929;
+		color: white;
+		font-weight: $semibold;
+		border-radius: $little-radius;
+		cursor: pointer;
+		text-align: center;
+	}
+}

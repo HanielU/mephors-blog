@@ -22,11 +22,10 @@
 		margin-bottom: 10px;
 		font-family: $main-font;
 		padding: 0 20px;
-		border-bottom: 1px solid $dark;
+		border-bottom: 1px solid #d1d1d1;
 		position: sticky;
 		top: 0;
 		left: 0;
-		// @include border;
 		@include flex($justify: space-between);
 
 		button {

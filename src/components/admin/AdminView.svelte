@@ -3,15 +3,13 @@
 	import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
 	import { onDestroy, setContext } from "svelte";
 	import PostsList from "./PostsList.svelte";
-	import All from "./All.svelte";
+	import AddOrEdit from "./AddOrEditForm.svelte";
 
 	// Default Initialisations
 	let posts,
 		id,
 		creatingPost = false,
 		edit = false;
-
-	$: props = { id, creatingPost, edit };
 
 	// Firestore related
 	let postsRef = collection(db, "posts");
@@ -20,7 +18,8 @@
 		postsQuery,
 		(snapShot) => (posts = snapShot.docs)
 	);
-	onDestroy(unsubscribe);
+
+	$: props = { id, creatingPost, edit };
 
 	// Functions
 	const toggleCreate = () => (creatingPost = !creatingPost);
@@ -31,13 +30,15 @@
 		id = e.detail;
 	}
 
+	onDestroy(unsubscribe);
+
 	// Context Setters
 	setContext("toggleCreate", toggleCreate);
 	setContext("toggleEdit", toggleEdit);
 </script>
 
 {#if creatingPost || edit}
-	<All {...props} />
+	<AddOrEdit {...props} />
 {:else}
 	<PostsList {posts} on:edit={handleEdit} />
 {/if}

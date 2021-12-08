@@ -1,6 +1,7 @@
 <script>
-	export let color = "white";
-	export let width, height;
+	export let width,
+		height,
+		color = "white";
 </script>
 
 <svg

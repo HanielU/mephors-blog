@@ -14,9 +14,9 @@
 
 	const toggleCreate = getContext("toggleCreate");
 
-	onMount(() => {
+	/* onMount(() => {
 		new ClipboardJS(".id");
-	});
+	}); */
 
 	$: gettingPosts = posts.length > 0 ? false : true;
 	$: if (action === "create") {
@@ -55,12 +55,12 @@
 >
 	<h3 class="posts__heading">Posts</h3>
 
-	{#if gettingPosts}
-		<p>Loading Please Wait</p>
-	{:else}
-		<section class="posts__list" in:fade={{ duration: 500 }}>
+	<section class="posts__list">
+		{#if gettingPosts}
+			<p>Loading Please Wait</p>
+		{:else}
 			{#each posts as post (post.id)}
-				<article>
+				<article in:fade={{ duration: 200 }}>
 					<span
 						class="id"
 						data-clipboard-text={post.data().postID}
@@ -90,17 +90,17 @@
 					</div>
 				</article>
 			{/each}
-		</section>
-	{/if}
+		{/if}
+	</section>
 
 	{#if !transitioning}
 		<div
 			class="create-post"
-			transition:fly={{ x: 200, duration: 200 }}
+			transition:fly={{ x: 200, duration: 100 }}
 			on:outroend={delayedEV}
 		>
 			<button on:click={() => setAction("create")}>
-				<PlusIcon width={"12px"} height={"12px"} />
+				<PlusIcon width="12px" height="12px" />
 				<span>Create New Post</span>
 			</button>
 		</div>
@@ -115,6 +115,7 @@
 
 	.posts {
 		// @include border;
+		// margin-top: 80px;
 		padding: 20px 20px 90px;
 
 		&__heading {

@@ -1,0 +1,63 @@
+.exit {
+	width: 100%;
+	height: 20%;
+	border-bottom: 1px solid #d1d1d1;
+	padding: 10px;
+	@include flex($justify: flex-start);
+}
+
+.form-wrapper {
+	@extend %background;
+	@include flex($align: flex-start);
+}
+
+form {
+	background: white;
+	width: Clamp(350px, 100%, 700px);
+	overflow-y: auto;
+	border-radius: $little-radius;
+	@include border($color: $light-gray);
+
+	input,
+	.content {
+		padding: 10px 14px;
+		width: 100%;
+	}
+
+	input {
+		font-size: $mid;
+		font-weight: $semibold;
+		border-bottom: 1px solid #d1d1d1;
+	}
+
+	.content {
+		font-size: $small;
+		min-height: 250px;
+		max-height: 400px;
+		overflow-y: auto;
+		white-space: pre-wrap;
+		margin-bottom: 10px;
+
+		@extend %scrollbar;
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	.submit {
+		width: 100%;
+		height: 20%;
+		border-bottom: 1px solid #d1d1d1;
+		padding: 10px;
+
+		button {
+			padding: 10px;
+			background: $blue;
+			border-radius: $little-radius;
+			color: white;
+			width: 100%;
+			font-size: $small;
+		}
+	}
+}

@@ -2,7 +2,7 @@
 	import { auth } from "./firebase";
 	import { authState } from "rxfire/auth";
 	import { user, showPost } from "./utils/store";
-	import { onDestroy, setContext } from "svelte";
+	import { onMount, onDestroy, setContext } from "svelte";
 	import { writable } from "svelte/store";
 	import SignIn from "./components/SignIn.svelte";
 	import Header from "./components/Header.svelte";
@@ -11,6 +11,7 @@
 	import AdminView from "./components/admin/AdminView.svelte";
 
 	// Variable declarations
+	let app;
 	let unsub = authState(auth).subscribe((usr) => ($user = usr));
 	const adminId = [
 		"bFkZyf72TuSoZe60AZxOtUDMyyY2",
@@ -20,6 +21,13 @@
 
 	// Reactive
 	$: userIsAdmin = $user ? adminId.includes($user.uid) : false;
+
+	// add overflow hidden when post is being shown
+	$: if ($showPost.value === true) {
+		app.classList.add("freeze");
+	} else if ($showPost.value === false) {
+		app.classList.remove("freeze");
+	}
 
 	// Functions
 	function checkRead(data) {
@@ -31,7 +39,12 @@
 		});
 	}
 
+	onMount(() => {
+		app = document.querySelector("#app");
+	});
+
 	onDestroy(() => unsub.unsubscribe());
+
 	setContext("postRead", postRead);
 	setContext("checkRead", checkRead);
 </script>
@@ -52,7 +65,7 @@
 		<SearchBlog />
 	{/if}
 
-	{#if $showPost.value}
+	{#if $showPost.value === true}
 		<Post />
 	{/if}
 {:else}

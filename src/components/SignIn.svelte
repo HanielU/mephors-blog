@@ -3,7 +3,7 @@
 </script>
 
 <section>
-	<div class="card">
+	<div class="sign-in-card">
 		<div class="logo-wrapper">
 			<h1>Logo</h1>
 		</div>
@@ -26,7 +26,7 @@
 		font-family: $main-font;
 	}
 
-	.card {
+	.sign-in-card {
 		padding: 30px 10px;
 		width: 100%;
 		max-width: 400px;
@@ -70,7 +70,7 @@
 	}
 
 	@media screen and (min-width: 768px) {
-		.card {
+		.sign-in-card {
 			max-width: 500px;
 			height: 500px;
 		}

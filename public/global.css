@@ -3,20 +3,23 @@
 	padding: 0;
 	box-sizing: border-box;
 	line-height: 1.6;
+	font-family: "Nunito", sans-serif;
+}
+html {
+	height: 100%;
 }
 
 body {
-	height: 100vh;
+	height: 100%;
 	width: 100%;
 	font-family: "Nunito", sans-serif;
+	position: relative;
+	overflow-x: hidden;
 }
 
 #app {
-	height: 100%;
 	width: 100%;
-	position: fixed;
-	top: 0;
-	left: 0;
+	height: 100%;
 	overflow-y: auto;
 }
 
@@ -42,4 +45,17 @@ textarea {
 
 span {
 	display: block;
+}
+
+.close-btn,
+.edit-post,
+.view-post,
+.del {
+	-webkit-tap-highlight-color: transparent;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.freeze {
+	overflow-y: hidden !important;
 }

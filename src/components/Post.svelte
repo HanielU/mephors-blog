@@ -8,18 +8,17 @@
 		deleteDoc,
 	} from "firebase/firestore";
 	import { getContext, onDestroy, onMount } from "svelte";
-	import { slide, fade } from "svelte/transition";
+	import { scale, fade } from "svelte/transition";
 	import { user, showPost } from "../utils/store";
-
-	onMount(() => {
-		new ClipboardJS(".copy");
-	});
+	import CloseBtn from "./shared/CloseBtn.svelte";
 
 	let postData,
 		title = "loading...",
 		content = "loading...",
 		postID = "",
 		actionStatement = "Delete";
+
+	let width, height;
 
 	let postRef = doc(db, "posts", $showPost.postID);
 	let unsubscribe = onSnapshot(postRef, (data) => {
@@ -34,6 +33,10 @@
 
 	const postRead = getContext("postRead");
 	const checkRead = getContext("checkRead");
+
+	onMount(() => {
+		new ClipboardJS(".copy");
+	});
 
 	$: checkRead(postData);
 
@@ -64,119 +67,51 @@
 	}
 </script>
 
-<div class="bg" transition:fade={{ duration: 300 }}>
-	<article class="post" transition:slide>
-		<span class="close" title="close" on:click={hidePost}> x </span>
-		<h1>
-			{title}
+<svelte:window bind:innerHeight={height} bind:innerWidth={width} />
 
-			{#if $showPost.calledBy === "admin"}
-				<span class="copy" data-clipboard-text={postID}> Copy ID </span>
-			{/if}
-		</h1>
+<div class="bg" transition:fade={{ duration: 300 }}>
+	<article class="post" transition:scale>
+		<div class="post__header">
+			<h1>
+				{title}
+
+				{#if $showPost.calledBy === "admin"}
+					<span class="copy" data-clipboard-text={postID}> Copy ID </span>
+				{/if}
+			</h1>
+
+			<CloseBtn on:click={hidePost} />
+		</div>
+
 		<p>
-			{content}
+			{@html content}
+			<!-- height {height}
+			width {width} -->
 		</p>
 
-		{#if $showPost.calledBy === "user"}
-			{#if !$postRead}
-				<label for="checkIfPostRead">
-					<input
-						type="checkbox"
-						checked={$postRead}
-						on:click={confirmRead}
-						name="checkIfPostRead"
-					/>
-					I have read this post
-				</label>
-			{:else}
-				<h4>You have read this post</h4>
+		<div class="action-wrapper">
+			{#if $showPost.calledBy === "user"}
+				{#if !$postRead}
+					<label for="checkIfPostRead">
+						<input
+							type="checkbox"
+							checked={$postRead}
+							on:click={confirmRead}
+							id="checkIfPostRead"
+						/>
+						I have read this post
+					</label>
+				{:else}
+					<h4>You have read this post</h4>
+				{/if}
+			{:else if $showPost.calledBy === "admin"}
+				<span class="del" on:click|self={deletePost}> {actionStatement} </span>
 			{/if}
-		{:else if $showPost.calledBy === "admin"}
-			<span class="del" on:click|self={deletePost}> {actionStatement} </span>
-		{/if}
+		</div>
 	</article>
 </div>
 
 <style lang="scss">
-	.del {
-		width: 90%;
-		margin: 10px auto;
-		padding: 15px;
-		background: #e52929;
-		color: white;
-		font-weight: $semibold;
-		border-radius: $little-radius;
-		cursor: pointer;
-		text-align: center;
-	}
-
-	.bg {
-		position: fixed;
-		height: 100vh;
-		width: 100%;
-		top: 0;
-		left: 0;
-		z-index: 2;
-		padding: 0 14px;
-		background: #eee;
-		@include flex;
-	}
-
-	.post {
-		@include border;
-		@include flex($justify: flex-start, $align: flex-start);
-		flex-direction: column;
-		border-radius: $little-radius;
-		position: relative;
-		height: 80vh;
-		width: 500px;
-		padding: 20px;
-		background: #fff;
-
-		h1 {
-			max-width: 30ch;
-			@include flex($justify: space-between, $align: flex-start);
-			flex-direction: column;
-
-			.copy {
-				display: block;
-				font-size: $smallest;
-				padding: 6px 12px;
-				margin-top: 10px;
-				color: #333;
-				cursor: pointer;
-				background-color: #eee;
-				background-image: linear-gradient(#fcfcfc, #eee);
-				border: 1px solid #d5d5d5;
-				border-radius: 3px;
-				user-select: none;
-				-webkit-appearance: none;
-			}
-		}
-
-		p {
-			overflow-y: auto;
-			max-height: 100%;
-			margin: 20px 0;
-		}
-	}
-
-	.close {
-		position: absolute;
-		right: 0;
-		top: 0;
-		background: #df5555;
-		color: #333;
-		font-weight: $semibold;
-		padding: 8px 15px;
-		border-top-right-radius: $little-radius - 3px;
-		cursor: pointer;
-	}
-
-	label,
-	h4,
-	.del {
-		margin-top: auto;
-	}
+	@import "../styles/PostComponent/post.scss";
+	@import "../styles/PostComponent/post_responsive.scss";
 </style>
