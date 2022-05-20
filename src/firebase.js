@@ -19,15 +19,15 @@ const firebaseConfig = {
 	measurementId: "G-28575SBW5Y",
 };
 
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth();
 export const googleProvider = new GoogleAuthProvider();
-export const db = getFirestore();
+export const db = getFirestore(app);
 
-export function login() {
-	signInWithPopup(auth, googleProvider);
+export async function login() {
+	await signInWithPopup(auth, googleProvider);
 }
-export function logout() {
-	signOut(auth);
+export async function logout() {
+	await signOut(auth);
 }

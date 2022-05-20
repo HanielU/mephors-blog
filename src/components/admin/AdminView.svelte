@@ -19,7 +19,7 @@
 		(snapShot) => (posts = snapShot.docs)
 	);
 
-	$: props = { id, creatingPost, edit };
+	$: props = { id, edit };
 
 	// Functions
 	const toggleCreate = () => (creatingPost = !creatingPost);
